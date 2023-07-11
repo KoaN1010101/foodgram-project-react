@@ -4,12 +4,12 @@ from users.models import User
 
 class Tag(models.Model):
     title = models.CharField(
-        verbose_name = 'Тэг',
+        verbose_name='Тэг',
         max_length=200,
         unique=True
     )
     colour = models.CharField(
-        verbose_name = 'Цветовой HEX-код',
+        verbose_name='Цветовой HEX-код',
         max_length=7,
         unique = True
     )
@@ -19,34 +19,34 @@ class Tag(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Тэг'
-        verbose_name_plural = 'Тэги'
+        verbose_name='Тэг'
+        verbose_name_plural='Тэги'
 
     def __str__(self):
         return self.title
-    
+
 
 class Ingredient(models.Model):
     title = models.CharField(
-        verbose_name = 'Ингридиент',
+        verbose_name='Ингридиент',
         max_length=200
     )
     measurement_unit = models.CharField(
-        verbose_name = 'Единица измерения',
+        verbose_name='Единица измерения',
         max_length=200
     )
 
     class Meta:
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        verbose_name='Ингридиент'
+        verbose_name_plural='Ингридиенты'
 
     def __str__(self):
         return f'{self.title} ({self.measurement_unit})'
-    
+
 
 class Recipe(models.Model):
     author = models.ForeignKey(
-        User, 
+        User,
         on_delete=models.CASCADE,
         related_name='recipes',
         verbose_name='Автор'
@@ -65,11 +65,11 @@ class Recipe(models.Model):
     )
     ingridients = models.ManyToManyField(
         Ingredient,
-        verbose_name = 'Ингридиенты'
+        verbose_name='Ингридиенты'
     )
     tag = models.ManyToManyField(
         Tag,
-        verbose_name = 'Тэг'
+        verbose_name='Тэг'
     )
     cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления'
@@ -81,13 +81,13 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering  = ['-pub_date']
-        verbose_name = 'Рецепт'
-        verbose_name_plural = 'Рецепты'
+        ordering=['-pub_date']
+        verbose_name='Рецепт'
+        verbose_name_plural='Рецепты'
 
     def __str__(self):
         return self.title
-    
+
 
 class AmountOfIngridient(models.Model):
     recipe = models.ForeignKey(
@@ -109,10 +109,11 @@ class AmountOfIngridient(models.Model):
     class Meta:
         verbose_name = 'Количество ингридиентов в рецепте'
         verbose_name_plural = 'Количество ингридиентов в рецептах'
-    
+
     def __str__(self):
         return f'{self.ingredient} ({self.amount})'
-    
+
+
 class FavouriteRecipe(models.Model):
     user = models.ForeignKey(
         User,
@@ -128,11 +129,12 @@ class FavouriteRecipe(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Избранный рецепт'
-        verbose_name_plural = 'Избранные рецепты'
+        verbose_name='Избранный рецепт'
+        verbose_name_plural='Избранные рецепты'
 
     def __str__(self):
-        return f'Пользователь {self.user.username} добавил {self.favourtie_recipe.title} в избранное'
+        return (f'Пользователь {self.user.username}'
+                f'добавил {self.favourtie_recipe.title} в избранное')
 
 
 class ShoppingCart(models.Model):
@@ -150,8 +152,9 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Корзина покупок'
-        verbose_name_plural = 'Корзина покупок'
+        verbose_name='Корзина покупок'
+        verbose_name_plural='Корзина покупок'
 
     def __str__(self):
-        return f'Пользователь {self.user.username} добавил {self.recipe.title} в корзину'
+        return (f'Пользователь {self.user.username}'
+                f'добавил {self.recipe.title} в корзину')

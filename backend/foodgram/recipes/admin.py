@@ -1,12 +1,12 @@
 from django.contrib import admin
 
-from recipes.models import (AmountOfIngridient, FavouriteRecipe, 
+from recipes.models import (AmountOfIngridient, FavouriteRecipe,
                             Ingredient, Recipe, ShoppingCart, Tag)
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('pk','title', 'colour', 'slug')
+    list_display = ('pk', 'title', 'colour', 'slug')
     search_fields = ('name', 'color', 'slug')
     empty_value_display = '-пусто-'
 
