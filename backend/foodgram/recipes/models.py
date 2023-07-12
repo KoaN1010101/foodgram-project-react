@@ -11,7 +11,7 @@ class Tag(models.Model):
     colour = models.CharField(
         verbose_name='Цветовой HEX-код',
         max_length=7,
-        unique = True
+        unique=True
     )
     slug = models.SlugField(
         max_length=200,
@@ -19,8 +19,8 @@ class Tag(models.Model):
     )
 
     class Meta:
-        verbose_name='Тэг'
-        verbose_name_plural='Тэги'
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
 
     def __str__(self):
         return self.title
@@ -37,8 +37,8 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        verbose_name='Ингридиент'
-        verbose_name_plural='Ингридиенты'
+        verbose_name = 'Ингридиент'
+        verbose_name_plural = 'Ингридиенты'
 
     def __str__(self):
         return f'{self.title} ({self.measurement_unit})'
@@ -52,16 +52,16 @@ class Recipe(models.Model):
         verbose_name='Автор'
     )
     title = models.CharField(
-        verbose_name = 'Рецепт',
+        verbose_name='Рецепт',
         max_length=200
     )
     image = models.ImageField(
-        verbose_name = 'Картинка',
+        verbose_name='Картинка',
         upload_to='recipes/'
     )
     description = models.TextField(
         verbose_name='Описание',
-        max_length = 200
+        max_length=200
     )
     ingridients = models.ManyToManyField(
         Ingredient,
@@ -81,9 +81,9 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering=['-pub_date']
-        verbose_name='Рецепт'
-        verbose_name_plural='Рецепты'
+        ordering = ['-pub_date']
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
     def __str__(self):
         return self.title
@@ -107,8 +107,8 @@ class AmountOfIngridient(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Количество ингридиентов в рецепте'
-        verbose_name_plural = 'Количество ингридиентов в рецептах'
+        verbose_name='Количество ингридиентов в рецепте'
+        verbose_name_plural='Количество ингридиентов в рецептах'
 
     def __str__(self):
         return f'{self.ingredient} ({self.amount})'
@@ -129,8 +129,8 @@ class FavouriteRecipe(models.Model):
     )
 
     class Meta:
-        verbose_name='Избранный рецепт'
-        verbose_name_plural='Избранные рецепты'
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
 
     def __str__(self):
         return (f'Пользователь {self.user.username}'
@@ -152,8 +152,8 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
-        verbose_name='Корзина покупок'
-        verbose_name_plural='Корзина покупок'
+        verbose_name = 'Корзина покупок'
+        verbose_name_plural = 'Корзина покупок'
 
     def __str__(self):
         return (f'Пользователь {self.user.username}'

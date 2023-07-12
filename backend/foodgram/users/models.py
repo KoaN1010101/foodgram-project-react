@@ -30,9 +30,9 @@ class User(AbstractUser):
     )
 
     class Meta:
-        ordering=('id',)
-        verbose_name='Пользователь'
-        verbose_name_plural='Пользователи'
+        ordering = ('id',)
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username
@@ -43,7 +43,7 @@ class Subscribe(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='subscriber',
-        verbose_name ='Подписчик'
+        verbose_name='Подписчик'
     )
     author = models.ForeignKey(
         User,
