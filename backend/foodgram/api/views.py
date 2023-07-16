@@ -99,14 +99,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return RecipeReadSerializer
         return RecipeCreateSerializer
-    
+
     @action(
         detail=True,
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated]
     )
     def favourite(self, request, pk):
-       return add_or_delete(pk, FavouriteRecipe)
+        return add_or_delete(pk, FavouriteRecipe)
 
     @action(
         detail=True,
