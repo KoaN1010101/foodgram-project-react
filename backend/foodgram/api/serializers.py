@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import check_password
+from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (AmountOfIngridient, FavouriteRecipe,
@@ -88,8 +89,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        if limit:
-            limit = request.query_params.get('recipes_limit')
         recipes = obj.recipes.all()
         if limit:
             recipes = recipes[:int(limit)]
@@ -201,14 +200,16 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return obj
 
     def create_ingredients(self, ingredients, recipe):
-        for ingredient in ingredients:
-            AmountOfIngridient.objects.bulk_create([
-                AmountOfIngridient(
-                    recipe=recipe,
-                    ingredient_id=ingredient.get('id'),
-                    amount=ingredient.get('amount'),)
-            ])
+        ingredients = [
+            AmountOfIngridient(
+                recipe=recipe,
+                ingredient=ingredient['id'],
+                amount=ingredient['amount']
+            ) for ingredient in ingredients
+        ]
+        AmountOfIngridient.objects.bulk_create(ingredients)
 
+    @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -217,6 +218,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         self.create_ingredients(ingredients, recipe)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         if 'ingredients' in validated_data:
             ingredients = validated_data.pop('ingredients')

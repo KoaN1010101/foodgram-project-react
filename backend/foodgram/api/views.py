@@ -9,6 +9,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
+from api.utils import add_or_delete
 from users.models import Subscribe, User
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPagination
@@ -98,17 +99,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return RecipeReadSerializer
         return RecipeCreateSerializer
-
+    
     @action(
         detail=True,
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated]
     )
     def favourite(self, request, pk):
-        if request.method == 'POST':
-            return self.add_to(FavouriteRecipe, request.user, pk)
-        else:
-            return self.delete_from(FavouriteRecipe, request.user, pk)
+       return add_or_delete(pk, FavouriteRecipe)
 
     @action(
         detail=True,
@@ -116,10 +114,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated, ]
     )
     def shopping_cart(self, request, pk):
-        if request.method == 'POST':
-            return self.add_to(ShoppingCart, request.user, pk)
-        else:
-            return self.delete_from(ShoppingCart, request.user, pk)
+        return add_or_delete(pk, ShoppingCart)
 
     @action(
         detail=False,

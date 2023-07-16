@@ -1,5 +1,7 @@
 from django.db import models
+from django.conf import settings
 from users.models import User
+from colorfield.fields import ColorField
 
 
 class Tag(models.Model):
@@ -8,10 +10,11 @@ class Tag(models.Model):
         max_length=200,
         unique=True
     )
-    colour = models.CharField(
+    colour = ColorField(
         verbose_name='Цветовой HEX-код',
-        max_length=7,
-        unique=True
+        unique=True,
+        default='#FF0000',
+        max_length=7
     )
     slug = models.SlugField(
         max_length=200,
