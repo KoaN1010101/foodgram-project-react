@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (FavouriteRecipe, Ingredient, Recipe,
-                            AmountOfIngridient, ShoppingCart, Tag)
+                            AmountOfIngredient, ShoppingCart, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
@@ -127,7 +127,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(
                 'В корзине нет товаров', status=status.HTTP_400_BAD_REQUEST)
 
-        ingredients = AmountOfIngridient.objects.filter(
+        ingredients = AmountOfIngredient.objects.filter(
             recipe__carts__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'

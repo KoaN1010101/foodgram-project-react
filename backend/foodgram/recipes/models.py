@@ -65,7 +65,7 @@ class Recipe(models.Model):
         verbose_name='Описание',
         max_length=200
     )
-    ingridients = models.ManyToManyField(
+    ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингридиенты'
     )
@@ -91,7 +91,7 @@ class Recipe(models.Model):
         return self.title
 
 
-class AmountOfIngridient(models.Model):
+class AmountOfIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,

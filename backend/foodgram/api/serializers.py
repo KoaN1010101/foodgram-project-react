@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import check_password
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import (AmountOfIngridient, FavouriteRecipe,
+from recipes.models import (AmountOfIngredient, FavouriteRecipe,
                             Ingredient, Recipe, ShoppingCart, Tag)
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
@@ -105,7 +105,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AmountOfIngridientSerializer(serializers.ModelSerializer):
+class AmountOfIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(
         source='ingredient.id',
     )
@@ -117,14 +117,14 @@ class AmountOfIngridientSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = AmountOfIngridient
+        model = AmountOfIngredient
         fields = ('id', 'title', 'measurement_unit', 'amount')
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=False, many=True)
     author = UserSerializer(read_only=True)
-    ingredients = AmountOfIngridientSerializer(
+    ingredients = AmountOfIngredientSerializer(
         many=True, source='recipe')
     is_favourited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -201,13 +201,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def create_ingredients(self, ingredients, recipe):
         ingredients = [
-            AmountOfIngridient(
+            AmountOfIngredient(
                 recipe=recipe,
                 ingredient=ingredient['id'],
                 amount=ingredient['amount']
             ) for ingredient in ingredients
         ]
-        AmountOfIngridient.objects.bulk_create(ingredients)
+        AmountOfIngredient.objects.bulk_create(ingredients)
 
     @transaction.atomic
     def create(self, validated_data):
