@@ -11,6 +11,7 @@ services:
   
   backend:
     image: koan24/foodgram_backend:latest
+    build: ../backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -22,6 +23,7 @@ services:
 
   frontend:
     image: koan24/foodgram_frontend:latest
+    build: ../frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
