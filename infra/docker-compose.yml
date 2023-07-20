@@ -40,6 +40,6 @@ services:
       - static_value:/staticfiles/
       - media_value:/media
     ports:
-      - "80:80"
+      - 8000:80
     depends_on:
       - backend
