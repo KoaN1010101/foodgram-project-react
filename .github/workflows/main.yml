@@ -109,26 +109,8 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
-    - name: Copy infra via ssh
-      uses: garygrossgarten/github-action-scp@release
-      with:
-        local: infra/
-        remote: /${{ secrets.USER }}/foodgram/
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-    - name: Copy docs
-      uses: garygrossgarten/github-action-scp@release
-      with:
-        local: docs
-        remote: /${{ secrets.USER }}/foodgram/docs/
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
     - name: Executing remote ssh commands to deploy
-      uses: garygrossgarten/github-action-ssh@release
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
