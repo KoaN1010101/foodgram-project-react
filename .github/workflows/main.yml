@@ -109,22 +109,26 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
-    - name: Run a multi-line script
-      run: |
-        mkdir ../build
-        cp -TR . ../build
-        tar -cvf deploy.tar ../build/
-    - name: Copy docker-compose.yml via ssh
-      uses: appleboy/scp-action@master
+    - name: Copy infra via ssh
+      uses: garygrossgarten/github-action-scp@release
       with:
+        local: infra/
+        remote: /${{ secrets.USERN }}/foodgram/
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: "docker-compose.yml"
-        target: "foodgram"
+    - name: Copy docs
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        local: docs
+        remote: /${{ secrets.USER }}/foodgram/docs/
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
     - name: Executing remote ssh commands to deploy
-      uses: appleboy/ssh-action@master
+      uses: garygrossgarten/github-action-ssh@release
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
