@@ -11,7 +11,6 @@ services:
   
   backend:
     image: koan24/foodgram_backend:latest
-    build: ../backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -23,19 +22,18 @@ services:
 
   frontend:
     image: koan24/foodgram_frontend:latest
-    build: ../frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
       - backend
 
   nginx:
-    image: koan24/kittygram_gateway:latest 
+    image: koan24/foodgram_gateway:latest 
     restart: always
     ports:
       - "80:80"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_value:/var/html/static/
