@@ -24,7 +24,7 @@ jobs:
 
     - name: Install dependencies
       run: | 
-        cd backend
+        cd backend/
         python -m pip install --upgrade pip
         pip install flake8
         pip install -r requirements.txt 
@@ -117,7 +117,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
-          cd backend
+          cd foodgram
           sudo docker compose -f docker-compose.yml pull
           sudo docker compose -f docker-compose.yml down
           sudo docker compose -f docker-compose.yml up -d
