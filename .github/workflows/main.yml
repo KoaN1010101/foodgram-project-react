@@ -24,7 +24,7 @@ jobs:
 
     - name: Install dependencies
       run: | 
-        cd /backend
+        cd /foodgram
         python -m pip install --upgrade pip
         pip install flake8
         pip install -r requirements.txt 
@@ -56,7 +56,7 @@ jobs:
       - name: Push to DockerHub
         uses: docker/build-push-action@v4
         with:
-          context: ./backend/foodgram
+          context: ./foodgram/
           push: true
           tags: koan24/foodgram_backend:latest
 
