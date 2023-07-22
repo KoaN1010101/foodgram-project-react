@@ -19,7 +19,7 @@ services:
     env_file: .env
     volumes:
       - static_value:/backend_static
-      - media_value:/app/media/
+      - media_value:/media/
     depends_on:
       - db
 
