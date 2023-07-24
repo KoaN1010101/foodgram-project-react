@@ -1,6 +1,6 @@
 import os
-from pathlib import Path
 
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-=^cl#=hsiqy2zg(844
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['84.252.140.85', '127.0.0.1', 'localhost', 'foodgram24.sytes.net']
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -96,10 +96,10 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'collected_static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
