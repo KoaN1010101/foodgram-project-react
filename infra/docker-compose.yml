@@ -11,7 +11,7 @@ services:
     restart: always
     env_file: .env
     volumes:
-      - db_value:/var/lib/postgresql/data/
+      - db_value:/var/lib/postgresql/data
   
   backend:
     image: koan24/foodgram_backend:latest
@@ -29,8 +29,6 @@ services:
     command: cp -r /app/build/. /frontend_static/
     volumes:
        - static_value:/frontend_static
-    depends_on:
-      - backend
 
   nginx:
     image: koan24/foodgram_gateway:latest
