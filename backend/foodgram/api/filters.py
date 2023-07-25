@@ -1,6 +1,7 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import filters, FilterSet
 
-from recipes.models import Ingredient, Recipe, Tag
+from recipes.models import AmountOfIngredient, Ingredient, Recipe, Tag
 
 
 class IngredientFilter(FilterSet):
@@ -37,3 +38,19 @@ class RecipeFilter(FilterSet):
         if self.request.user.is_authenticated and value:
             return queryset.filter(carts__user=self.request.user)
         return queryset
+
+
+def creating_an_ingredient(ingredients, recipe):
+    ingredient_list = []
+    for ingredient in ingredients:
+        current_ingredient = get_object_or_404(Ingredient,
+                                               id=ingredient.get('id'))
+        amount = ingredient.get('amount')
+        ingredient_list.append(
+            AmountOfIngredient(
+                recipe=recipe,
+                ingredient=current_ingredient,
+                amount=amount
+            )
+        )
+    AmountOfIngredient.objects.bulk_create(ingredient_list)

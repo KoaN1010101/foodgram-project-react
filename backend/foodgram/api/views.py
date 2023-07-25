@@ -16,7 +16,7 @@ from .pagination import CustomPagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer,
-                          SubscribeSerializer, TagSerializer,
+                          SubscribeSerializer, SubscribeRecipeSerializer, TagSerializer,
                           UserSerializer)
 
 
@@ -39,29 +39,33 @@ class UserViewSet(UserViewSet):
         methods=['POST', 'DELETE'],
         permission_classes=(IsAuthenticated,)
     )
-    def subscribe(self, request, id):
-        user = request.user
-        author = get_object_or_404(User, pk=id)
+    def subscribe(self, request, user_id):
+        author = get_object_or_404(User, id=user_id)
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
                 author, data=request.data, context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
-            Subscribe.objects.create(username=user, author=author)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            get_object_or_404(
-                Subscribe, username=user, author=author
-            ).delete()
+            if not Subscribe.objects.filter(user=request.user,
+                                           author=author).exists():
+                return Response(
+                    {'errors': 'Вы не подписаны на этого пользователя'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            Subscribe.objects.get(user=request.user.id,
+                                     author=id).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
         queryset = User.objects.filter(following__username=request.user)
         pages = self.paginate_queryset(queryset)
-        serializer = SubscribeSerializer(
+        serializer = SubscribeRecipeSerializer(
             pages,
             many=True,
             context={'request': request},)
