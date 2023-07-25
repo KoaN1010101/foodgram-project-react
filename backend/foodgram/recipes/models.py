@@ -11,12 +11,13 @@ class Tag(models.Model):
     colour = models.CharField(
         verbose_name='Цветовой HEX-код',
         unique=True,
-        default='#FF0000',
-        max_length=7
+        max_length=7,
+        db_index=False
     )
-    slug = models.SlugField(
+    slug = models.CharField(
         max_length=200,
-        unique=True
+        unique=True,
+        db_index=False
     )
 
     class Meta:
