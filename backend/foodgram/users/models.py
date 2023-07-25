@@ -48,7 +48,7 @@ class Subscribe(models.Model):
         verbose_name='Автор',
         on_delete=models.CASCADE,
     )
-    
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
