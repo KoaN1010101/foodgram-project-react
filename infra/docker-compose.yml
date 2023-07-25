@@ -9,14 +9,16 @@ services:
   db:
     image: postgres:13.10
     restart: always
-    env_file: .env
+    env_file:
+      - ./.env
     volumes:
       - db_value:/var/lib/postgresql/data
   
   backend:
     image: koan24/foodgram_backend:latest
     restart: always
-    env_file: .env
+    env_file:
+      - ./.env
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
@@ -25,7 +27,8 @@ services:
 
   frontend:
     image: koan24/foodgram_frontend:latest
-    env_file: .env
+    env_file:
+      - ./.env
     volumes:
        - ../frontend/:/app/result_build/
     depends_on:
@@ -33,7 +36,8 @@ services:
 
   nginx:
     image: koan24/foodgram_gateway:latest
-    env_file: .env
+    env_file:
+      - ./.env
     restart: always
     volumes:
       - ../frontend/build:/usr/share/nginx/html/
