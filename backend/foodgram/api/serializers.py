@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import check_password
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from api.utils import creating_an_ingredient
+from .filters import creating_an_ingredient
 from recipes.models import (AmountOfIngredient, FavouriteRecipe,
                             Ingredient, Recipe, ShoppingCart, Tag)
 from rest_framework import serializers, status

@@ -9,9 +9,8 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
-from api.utils import add_or_delete
 from users.models import Subscribe, User
-from .filters import IngredientFilter, RecipeFilter
+from .filters import add_or_delete, IngredientFilter, RecipeFilter
 from .pagination import CustomPagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer,
