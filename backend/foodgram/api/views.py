@@ -16,7 +16,7 @@ from .pagination import CustomPagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer,
-                          SubscribeSerializer, SubscribeRecipeSerializer, 
+                          SubscribeSerializer, SubscribeRecipeSerializer,
                           TagSerializer, UserSerializer)
 
 
@@ -57,7 +57,7 @@ class UserViewSet(UserViewSet):
                     {'errors': 'Вы не подписаны на этого пользователя'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            Subscribe.objects.get(user=request.user.id, 
+            Subscribe.objects.get(user=request.user.id,
                                   author=id).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
