@@ -16,17 +16,14 @@ class User(AbstractUser):
     first_name = models.CharField(
         verbose_name='Имя',
         max_length=200,
-        unique=True
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
         max_length=200,
-        unique=True
     )
     password = models.CharField(
         verbose_name='Пароль',
         max_length=200,
-        unique=True
     )
 
     class Meta:
@@ -51,3 +48,15 @@ class Subscribe(models.Model):
         verbose_name='Автор',
         on_delete=models.CASCADE,
     )
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='unique_user_author'
+            )
+        ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
+    def __str__(self):
+        return f'{self.user.username} подписан на {self.author.username}'
