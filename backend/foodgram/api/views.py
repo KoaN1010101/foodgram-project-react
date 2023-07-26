@@ -16,8 +16,9 @@ from .pagination import CustomPagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer,
-                          SubscribeSerializer, SubscribeRecipeSerializer,
-                          TagSerializer, UserSerializer)
+                          RecipeLittleSerializer, SubscribeSerializer, 
+                          SubscribeRecipeSerializer,TagSerializer, 
+                          UserSerializer)
 
 
 class UserViewSet(UserViewSet):
@@ -95,6 +96,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
+    add_serializer = RecipeLittleSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):

@@ -208,13 +208,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
         if not data.get('ingredients'):
             raise serializers.ValidationError(
-                'Минимум 1 ингридиент.'
+                'Минимум 1 ингредиент.'
             )
         inrgedient_id_list = [item['id'] for item in data.get('ingredients')]
         unique_ingredient_id_list = set(inrgedient_id_list)
         if len(inrgedient_id_list) != len(unique_ingredient_id_list):
             raise serializers.ValidationError(
-                'Ингридиенты должны быть уникальны.'
+                'Ингредиенты должны быть уникальны.'
             )
         return data
 
