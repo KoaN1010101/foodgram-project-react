@@ -95,12 +95,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS:
+        if self.action in ('list', 'retrieve'):
             return RecipeReadSerializer
         return RecipeCreateSerializer
 

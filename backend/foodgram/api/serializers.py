@@ -156,7 +156,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id', 'tags', 'author', 'ingredients', 'is_favourited',
+            'id', 'tags', 'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time'
         )
 
@@ -197,27 +197,27 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'id', 'tags', 'ingredients',
             'name', 'image', 'text', 'cooking_time')
 
-    def validate(self, obj):
+    def validate(self, data):
         for field in ['name', 'text', 'cooking_time']:
-            if not obj.get(field):
+            if not data.get(field):
                 raise serializers.ValidationError(
                     f'{field} - Обязательное поле.'
                 )
-        if not obj.get('tags'):
+        if not data.get('tags'):
             raise serializers.ValidationError(
                 'Минимум 1 тэг.'
             )
-        if not obj.get('ingredients'):
+        if not data.get('ingredients'):
             raise serializers.ValidationError(
                 'Минимум 1 ингридиент.'
             )
-        inrgedient_id_list = [item['id'] for item in obj.get('ingredients')]
+        inrgedient_id_list = [item['id'] for item in data.get('ingredients')]
         unique_ingredient_id_list = set(inrgedient_id_list)
         if len(inrgedient_id_list) != len(unique_ingredient_id_list):
             raise serializers.ValidationError(
                 'Ингридиенты должны быть уникальны.'
             )
-        return obj
+        return data
 
     @transaction.atomic
     def create(self, validated_data):
