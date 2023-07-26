@@ -28,6 +28,7 @@ def add_or_delete(self, pk, serializer_class):
     model_obj.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 def creating_an_ingredient(ingredients, recipe):
     ingredient_list = []
     for ingredient in ingredients:

@@ -15,9 +15,9 @@ from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
 from api.permissions import IsAdminAuthorOrReadOnly
 from api.serializers import (IngredientSerializer,
-                          RecipeCreateSerializer, RecipeReadSerializer,
-                          SubscribeSerializer, SubscribeInfoSerializer,
-                          TagSerializer, UserSerializer)
+                             RecipeCreateSerializer, RecipeReadSerializer,
+                             SubscribeSerializer, SubscribeInfoSerializer,
+                             TagSerializer, UserSerializer)
 
 
 class UserViewSet(UserViewSet):
