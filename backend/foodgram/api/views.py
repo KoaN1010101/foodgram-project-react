@@ -16,8 +16,8 @@ from .pagination import CustomPagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer,
-                          SubscribeSerializer, TagSerializer,
-                          UserSerializer)
+                          SubscribeSerializer, SubscribeInfoSerializer, 
+                          TagSerializer, UserSerializer)
 
 
 class UserViewSet(UserViewSet):
@@ -65,7 +65,7 @@ class UserViewSet(UserViewSet):
     def subscriptions(self, request):
         queryset = User.objects.filter(following__username=request.user)
         pages = self.paginate_queryset(queryset)
-        serializer = SubscribeRecipeSerializer(
+        serializer = SubscribeInfoSerializer(
             pages,
             many=True,
             context={'request': request},)
