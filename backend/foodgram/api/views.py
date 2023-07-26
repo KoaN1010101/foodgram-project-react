@@ -105,7 +105,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated]
+        permission_classes=[IsAuthenticated, ]
     )
     def favourite(self, request, pk):
         return add_or_delete(pk, FavouriteRecipe)
