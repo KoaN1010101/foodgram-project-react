@@ -13,7 +13,7 @@
       "pk": 2,
       "fields":{
         "name": "обед",
-        "color": "#99f542",
+        "color": "#03fc6f",
         "slug": "lunch"
       }
     },
