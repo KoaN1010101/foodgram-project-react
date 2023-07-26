@@ -186,6 +186,7 @@ class IngredientsPostSerializer(serializers.ModelSerializer):
 class RecipeCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
                                               many=True)
+    author = UserSerializer(read_only=True)
     ingredients = IngredientsPostSerializer(
         many=True)
     image = Base64ImageField()
@@ -220,9 +221,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        author = self.context.get('request').user
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(**validated_data)
+        recipe = Recipe.objects.create(author=author, **validated_data)
         recipe.tags.set(tags)
         creating_an_ingredient(ingredients, recipe)
         return recipe

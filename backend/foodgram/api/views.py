@@ -13,7 +13,7 @@ from api.utils import add_or_delete
 from users.models import Subscribe, User
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
-from api.permissions import IsAdminAuthorOrReadOnly
+from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (IngredientSerializer,
                              RecipeCreateSerializer, RecipeReadSerializer,
                              SubscribeSerializer, SubscribeInfoSerializer,
@@ -90,7 +90,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (IsAdminAuthorOrReadOnly, )
+    permission_classes = (IsOwnerOrReadOnly, )
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
