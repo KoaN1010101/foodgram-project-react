@@ -123,8 +123,8 @@ class AmountOfIngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(
         source='ingredient.id',
     )
-    title = serializers.CharField(
-        source='ingredient.title',
+    name = serializers.CharField(
+        source='ingredient.name',
     )
     measurement_unit = serializers.CharField(
         source='ingredient.measurement_unit',
@@ -132,7 +132,7 @@ class AmountOfIngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AmountOfIngredient
-        fields = ('id', 'title', 'measurement_unit', 'amount')
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class IngredientPostSerializer(serializers.ModelSerializer):

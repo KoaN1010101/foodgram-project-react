@@ -3,21 +3,20 @@ from users.models import User
 
 
 class Tag(models.Model):
-    title = models.CharField(
+    name = models.CharField(
         verbose_name='Тэг',
         max_length=200,
         unique=True
     )
-    colour = models.CharField(
+    color = models.CharField(
         verbose_name='Цветовой HEX-код',
-        unique=True,
+        default='#FF0000',
         max_length=7,
-        db_index=False
+        unique=True
     )
-    slug = models.CharField(
+    slug = models.SlugField(
         max_length=200,
-        unique=True,
-        db_index=False
+        unique=True
     )
 
     class Meta:
@@ -25,11 +24,11 @@ class Tag(models.Model):
         verbose_name_plural = 'Тэги'
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Ingredient(models.Model):
-    title = models.CharField(
+    name = models.CharField(
         verbose_name='Ингридиент',
         max_length=200
     )
@@ -43,7 +42,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ингридиенты'
 
     def __str__(self):
-        return f'{self.title} ({self.measurement_unit})'
+        return f'{self.name} ({self.measurement_unit})'
 
 
 class Recipe(models.Model):
@@ -53,7 +52,7 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Автор'
     )
-    title = models.CharField(
+    name = models.CharField(
         verbose_name='Рецепт',
         max_length=200
     )
@@ -61,7 +60,7 @@ class Recipe(models.Model):
         verbose_name='Изображние',
         upload_to='recipes/'
     )
-    description = models.TextField(
+    text = models.TextField(
         verbose_name='Описание',
         max_length=200
     )
@@ -69,7 +68,7 @@ class Recipe(models.Model):
         Ingredient,
         verbose_name='Ингридиенты'
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         Tag,
         verbose_name='Тэг'
     )
@@ -88,7 +87,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class AmountOfIngredient(models.Model):
@@ -123,7 +122,7 @@ class FavouriteRecipe(models.Model):
         related_name='favourite',
         verbose_name='Пользователь'
     )
-    favourtie_recipe = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='favourite',
@@ -136,7 +135,7 @@ class FavouriteRecipe(models.Model):
 
     def __str__(self):
         return (f'Пользователь {self.user.username}'
-                f'добавил {self.favourtie_recipe.title} в избранное')
+                f'добавил {self.recipe.name} в избранное')
 
 
 class ShoppingCart(models.Model):
@@ -159,4 +158,4 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return (f'Пользователь {self.user.username}'
-                f'добавил {self.recipe.title} в корзину')
+                f'добавил {self.recipe.name} в корзину')

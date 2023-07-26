@@ -8,5 +8,5 @@ class TagForm(ModelForm):
         model = Tag
         fields = '__all__'
         widgets = {
-            'colour': TextInput(attrs={'type': 'colour'}),
+            'color': TextInput(attrs={'type': 'color'}),
         }
