@@ -11,10 +11,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from api.utils import add_or_delete
 from users.models import Subscribe, User
-from .filters import IngredientFilter, RecipeFilter
-from .pagination import CustomPagination
-from .permissions import IsOwnerOrReadOnly
-from .serializers import (IngredientSerializer,
+from api.filters import IngredientFilter, RecipeFilter
+from api.pagination import CustomPagination
+from api.permissions import IsAdminAuthorOrReadOnly
+from api.serializers import (IngredientSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer,
                           SubscribeSerializer, SubscribeInfoSerializer,
                           TagSerializer, UserSerializer)
@@ -90,7 +90,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (IsOwnerOrReadOnly, )
+    permission_classes = (IsAdminAuthorOrReadOnly, )
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter

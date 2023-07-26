@@ -1,8 +1,8 @@
 from django.contrib.auth.hashers import check_password
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
+from api.utils import creating_an_ingredient
 from recipes.models import (AmountOfIngredient, FavouriteRecipe,
                             Ingredient, Recipe, ShoppingCart, Tag)
 from rest_framework import serializers, status
@@ -186,7 +186,6 @@ class IngredientsPostSerializer(serializers.ModelSerializer):
 class RecipeCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
                                               many=True)
-    author = UserSerializer
     ingredients = IngredientsPostSerializer(
         many=True)
     image = Base64ImageField()
@@ -221,29 +220,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        author = self.context.get('request').user
-        tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-
-        recipe = Recipe.objects.create(author=author, **validated_data)
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-
-        recipe_ingredients = []
-
-        for ingredient in ingredients:
-            amount = ingredient['amount']
-            ingredient_instance = ingredient['id']
-            ingredient = get_object_or_404(Ingredient, pk=ingredient_instance)
-
-            recipe_ingredients.append(
-                AmountOfIngredient(
-                    recipe=recipe,
-                    ingredient=ingredient,
-                    amount=amount
-                )
-            )
-        AmountOfIngredient.objects.bulk_create(recipe_ingredients)
-
+        creating_an_ingredient(ingredients, recipe)
         return recipe
 
     @transaction.atomic
