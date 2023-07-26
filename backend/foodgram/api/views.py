@@ -7,7 +7,7 @@ from recipes.models import (FavouriteRecipe, Ingredient, Recipe,
                             AmountOfIngredient, ShoppingCart, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from api.utils import add_or_delete
 from users.models import Subscribe, User
