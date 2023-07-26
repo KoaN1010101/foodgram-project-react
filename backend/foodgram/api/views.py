@@ -16,7 +16,7 @@ from .pagination import CustomPagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer,
                           RecipeCreateSerializer, RecipeReadSerializer,
-                          SubscribeSerializer, SubscribeInfoSerializer, 
+                          SubscribeSerializer, SubscribeInfoSerializer,
                           TagSerializer, UserSerializer)
 
 
