@@ -7,7 +7,7 @@ from recipes.models import (FavouriteRecipe, Ingredient, Recipe,
                             AmountOfIngredient, ShoppingCart, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from api.utils import add_or_delete
 from users.models import Subscribe, User
@@ -76,27 +76,25 @@ class UserViewSet(UserViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    permission_classes = (IsOwnerOrReadOnly, )
-    filter_backends = (DjangoFilterBackend,)
+    permission_classes = (AllowAny, )
+    filter_backends = (DjangoFilterBackend, )
     filterset_class = IngredientFilter
-    search_fields = ('^name', )
     pagination_class = None
 
 
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (IsOwnerOrReadOnly, )
+    permission_classes = (AllowAny, )
     pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly, )
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
-    add_serializer = RecipeLittleSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
