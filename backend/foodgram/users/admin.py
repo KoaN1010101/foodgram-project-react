@@ -6,7 +6,7 @@ from .models import User, Subscribe
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'username', 'email', 'first_name', 'last_name',
+        'pk', 'username', 'email', 'first_name', 'last_name',
     )
     search_fields = ('username', 'email', 'first_name', 'last_name')
     list_filter = ('username', 'email')

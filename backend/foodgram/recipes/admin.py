@@ -40,7 +40,7 @@ class AmountOfIngredientAdmin(admin.ModelAdmin):
 @admin.register(FavouriteRecipe)
 class FavouriteRecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe')
-    search_fields = ('user', 'favourtie_recipe')
+    search_fields = ('user', 'recipe')
     empty_value_display = '-пусто-'
 
 
