@@ -33,6 +33,12 @@ class UserSerializer(UserSerializer):
         ).exists())
 
 
+class RecipeLittleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -53,12 +59,6 @@ class SetPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 'current_password': 'Введен неверный пароль.'})
         return data
-
-
-class RecipeLittleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class SubscribeInfoSerializer(UserSerializer):
@@ -190,16 +190,24 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                   'name', 'text', 'cooking_time')
 
     def validate(self, data):
-        ingredients_list = []
-        for ingredient in data.get('amountofingredient'):
-            if ingredient.get('amount') <= 0:
+        for field in ['name', 'text', 'cooking_time']:
+            if not data.get(field):
                 raise serializers.ValidationError(
-                    'Количество не может быть меньше 1'
+                    f'{field} - Обязательное поле.'
                 )
-            ingredients_list.append(ingredient.get('id'))
-        if len(set(ingredients_list)) != len(ingredients_list):
+        if not data.get('tags'):
             raise serializers.ValidationError(
-                'Вы пытаетесь добавить в рецепт два одинаковых ингредиента'
+                'Минимум 1 тэг.'
+            )
+        if not data.get('amountofingredient'):
+            raise serializers.ValidationError(
+                'Минимум 1 ингредиент.'
+            )
+        inrgedient_id_list = [item['id'] for item in data.get('amountofingredient')]
+        unique_ingredient_id_list = set(inrgedient_id_list)
+        if len(inrgedient_id_list) != len(unique_ingredient_id_list):
+            raise serializers.ValidationError(
+                'Ингредиенты должны быть уникальны.'
             )
         return data
 
