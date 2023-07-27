@@ -72,6 +72,13 @@ class SubscribeInfoSerializer(UserSerializer):
                   'first_name', 'last_name', 'is_subscribed',
                   'recipes', 'recipes_count',)
 
+    def get_is_subscribed(self, obj):
+        return (
+            self.context.get('request').user.is_authenticated
+            and Subscription.objects.filter(user=self.context['request'].user,
+                                         author=obj).exists()
+        )
+
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
@@ -86,10 +93,17 @@ class SubscribeInfoSerializer(UserSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-
+    email = serializers.ReadOnlyField()
+    username = serializers.ReadOnlyField()
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = RecipeLittleSerializer(many=True, read_only=True)
+    recipes_count = serializers.SerializerMethodField()
     class Meta:
-        model = Subscription
-        fields = '__all__'
+        model = User
+        fields = ('email', 'id',
+                  'username', 'first_name',
+                  'last_name', 'is_subscribed',
+                  'recipes', 'recipes_count')
 
     def validate(self, data):
         user = self.context.get('request').user
@@ -105,6 +119,13 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 code=status.HTTP_400_BAD_REQUEST
             )
         return data
+    
+    def get_is_subscribed(self, obj):
+        return (
+            self.context.get('request').user.is_authenticated
+            and Subscription.objects.filter(user=self.context['request'].user,
+                                         author=obj).exists()
+        )
 
     def to_representation(self, instance):
         request = self.context.get('request')
