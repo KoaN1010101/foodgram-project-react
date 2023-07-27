@@ -18,7 +18,7 @@ from api.serializers import (IngredientSerializer, FavoriteSerializer,
                              RecipeCreateSerializer, RecipeReadSerializer,
                              ShoppingCartSerializer,
                              SubscribeSerializer, SubscribeInfoSerializer,
-                             TagSerializer, UserSerializer)
+                             TagSerializer)
 
 
 class UserSubscribeView(APIView):
