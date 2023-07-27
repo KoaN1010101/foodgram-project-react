@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (FavouriteRecipe, Ingredient, Recipe,
+from recipes.models import (Favorite, Ingredient, Recipe,
                             AmountOfIngredient, ShoppingCart, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -106,8 +106,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated, ]
     )
-    def favourite(self, request, pk):
-        return add_or_delete(pk, FavouriteRecipe)
+    def favorite(self, request, pk):
+        return add_or_delete(pk, Favorite)
 
     @action(
         detail=True,

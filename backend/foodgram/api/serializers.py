@@ -3,7 +3,7 @@ from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from api.utils import creating_an_ingredient
-from recipes.models import (AmountOfIngredient, FavouriteRecipe,
+from recipes.models import (AmountOfIngredient, Favorite,
                             Ingredient, Recipe, ShoppingCart, Tag)
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
@@ -147,8 +147,7 @@ class IngredientPostSerializer(serializers.ModelSerializer):
 class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
-    ingredients = AmountOfIngredientSerializer(many=True, read_only=True,
-                                               source='amountofingredient')
+    ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=False)
@@ -162,7 +161,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         return (request and request.user.is_authenticated
-                and FavouriteRecipe.objects.filter(
+                and Favorite.objects.filter(
                     user=request.user, recipe=obj
                 ).exists())
 
@@ -243,16 +242,16 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ).data
 
 
-class FavouriteRecipeSerializer(serializers.ModelSerializer):
+class FavoriteRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = FavouriteRecipe
+        model = Favorite
         fields = ('id', 'name', 'image', 'cooking_time')
 
     def validate(self, data):
         user = self.context.get('request').user
         recipe = self.context.get('recipe_id')
-        if FavouriteRecipe.objects.filter(user=user,
+        if Favorite.objects.filter(user=user,
                                           favorite_recipe=recipe).exists():
             raise serializers.ValidationError({
                 'errors': 'Рецепт уже в избранном'})
