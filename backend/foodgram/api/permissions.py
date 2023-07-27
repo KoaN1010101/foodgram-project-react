@@ -13,4 +13,3 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
                 or request.user.is_superuser
                 or request.user.is_staff
                 or obj.author == request.user)
-

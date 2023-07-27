@@ -52,13 +52,13 @@ class UserViewSet(UserViewSet):
 
         if request.method == 'DELETE':
             if not Subscription.objects.filter(user=request.user,
-                                            author=author).exists():
+                                               author=author).exists():
                 return Response(
                     {'errors': 'Вы не подписаны на этого пользователя'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             Subscription.objects.get(user=request.user.id,
-                                  author=id).delete()
+                                     author=id).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
