@@ -22,7 +22,6 @@ from api.serializers import (IngredientSerializer, FavoriteSerializer,
 
 
 class UserSubscribeView(APIView):
-    """Создание/удаление подписки на пользователя."""
     def post(self, request, user_id):
         author = get_object_or_404(User, id=user_id)
         serializer = SubscribeSerializer(
