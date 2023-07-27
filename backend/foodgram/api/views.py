@@ -108,7 +108,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             serializer = RecipeLittleSerializer(recipe, data=request.data,
-                                          context={"request": request})
+                                                context={"request": request})
             serializer.is_valid(raise_exception=True)
             if not Favorite.objects.filter(user=request.user,
                                            recipe=recipe).exists():
@@ -132,10 +132,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             serializer = RecipeLittleSerializer(recipe, data=request.data,
-                                          context={"request": request})
+                                                context={"request": request})
             serializer.is_valid(raise_exception=True)
             if not ShoppingCart.objects.filter(user=request.user,
-                                                recipe=recipe).exists():
+                                               recipe=recipe).exists():
                 ShoppingCart.objects.create(user=request.user, recipe=recipe)
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
@@ -149,9 +149,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {'detail': 'Рецепт успешно удален из списка покупок.'},
                 status=status.HTTP_204_NO_CONTENT
             )
-
-    @action(detail=False, methods=['get'],
-            permission_classes=(IsAuthenticated,))
 
     @action(
         detail=False,
