@@ -9,15 +9,15 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from api.utils import add_or_delete
 from users.models import Subscription, User
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
 from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (IngredientSerializer,
-                             RecipeCreateSerializer, RecipeReadSerializer,
-                             SubscribeSerializer, SubscribeInfoSerializer,
-                             TagSerializer, UserSerializer)
+                             RecipeCreateSerializer, RecipeLittleSerializer,
+                             RecipeReadSerializer, SubscribeSerializer,
+                             SubscribeInfoSerializer, TagSerializer,
+                             UserSerializer)
 
 
 class UserViewSet(UserViewSet):
@@ -101,30 +101,66 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeCreateSerializer
 
-    @action(
-        detail=True,
-        methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated, ]
-    )
-    def favorite(self, request, pk):
-        return add_or_delete(pk, Favorite)
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=(IsAuthenticated,))
+    def favorite(self, request, **kwargs):
+        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
 
-    @action(
-        detail=True,
-        methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated, ]
-    )
-    def shopping_cart(self, request, pk):
-        return add_or_delete(pk, ShoppingCart)
+        if request.method == 'POST':
+            serializer = RecipeLittleSerializer(recipe, data=request.data,
+                                          context={"request": request})
+            serializer.is_valid(raise_exception=True)
+            if not Favorite.objects.filter(user=request.user,
+                                           recipe=recipe).exists():
+                Favorite.objects.create(user=request.user, recipe=recipe)
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
+            return Response({'errors': 'Рецепт уже в избранном.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if request.method == 'DELETE':
+            get_object_or_404(Favorite, user=request.user,
+                              recipe=recipe).delete()
+            return Response({'detail': 'Рецепт успешно удален из избранного.'},
+                            status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=(IsAuthenticated,),
+            pagination_class=None)
+    def ShoppingCart(self, request, **kwargs):
+        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
+
+        if request.method == 'POST':
+            serializer = RecipeLittleSerializer(recipe, data=request.data,
+                                          context={"request": request})
+            serializer.is_valid(raise_exception=True)
+            if not ShoppingCart.objects.filter(user=request.user,
+                                                recipe=recipe).exists():
+                ShoppingCart.objects.create(user=request.user, recipe=recipe)
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
+            return Response({'errors': 'Рецепт уже в списке покупок.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if request.method == 'DELETE':
+            get_object_or_404(ShoppingCart, user=request.user,
+                              recipe=recipe).delete()
+            return Response(
+                {'detail': 'Рецепт успешно удален из списка покупок.'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+
+    @action(detail=False, methods=['get'],
+            permission_classes=(IsAuthenticated,))
 
     @action(
         detail=False,
         methods=['get'],
         permission_classes=[IsAuthenticated, ]
     )
-    def download_shopping_cart(self, request):
+    def download_ShoppingCart(self, request):
         user = request.user
-        if not user.shopping_cart.exists():
+        if not user.ShoppingCart.exists():
             return Response(
                 'Корзина пустая', status=status.HTTP_400_BAD_REQUEST)
 
