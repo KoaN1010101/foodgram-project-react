@@ -3,41 +3,31 @@ from django.db import models
 
 
 class User(AbstractUser):
-    email = models.EmailField(
-        'Электронная почта',
-        max_length=254,
-        unique=True,
-        blank=False,
-        null=False,
-    )
     username = models.CharField(
-        'Имя пользователя',
-        max_length=150,
-        unique=True,
-        blank=False,
-        null=False,
+        verbose_name='Пользователь',
+        max_length=200,
+        unique=True
+    )
+    email = models.EmailField(
+        verbose_name='Электронная почта',
+        max_length=200,
+        unique=True
     )
     first_name = models.CharField(
-        'Имя',
-        max_length=150,
-        blank=False,
-        null=False,
+        verbose_name='Имя',
+        max_length=200,
     )
     last_name = models.CharField(
-        'Фамилия',
-        max_length=150,
-        blank=False,
-        null=False
+        verbose_name='Фамилия',
+        max_length=200,
     )
     password = models.CharField(
-        'Пароль',
-        max_length=150,
-        blank=False,
-        null=False,
+        verbose_name='Пароль',
+        max_length=200,
     )
 
     class Meta:
-        ordering = ['id']
+        ordering = ('id',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
@@ -49,14 +39,14 @@ class Subscription(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='follower',
-        verbose_name='Пользователь',
+        related_name='subscriber',
+        verbose_name='Подписчик'
     )
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        related_name='following',
+        related_name='subscribing',
         verbose_name='Автор',
+        on_delete=models.CASCADE,
     )
 
     class Meta:
