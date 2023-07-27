@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 
 class User(AbstractUser):
@@ -50,14 +51,14 @@ class Subscription(models.Model):
     )
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'author'],
-                name='unique_user_author'
-            )
-        ]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+    
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError(
+                {'error': 'Невозможно подписаться на себя'}
+            )
 
     def __str__(self):
         return f'{self.user.username} подписан на {self.author.username}'
