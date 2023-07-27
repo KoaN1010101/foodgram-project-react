@@ -5,7 +5,7 @@ from drf_extra_fields.fields import Base64ImageField
 from api.utils import creating_an_ingredient
 from recipes.models import (AmountOfIngredient, Favorite,
                             Ingredient, Recipe, ShoppingCart, Tag)
-from rest_framework import serializers, status
+from rest_framework import serializers
 from users.models import User, Subscription
 
 
@@ -126,7 +126,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author', 'ingredients',
                   'is_favorited', 'is_in_shopping_cart', 'name',
                   'image', 'text', 'cooking_time')
-    
+
     def get_ingredients(self, obj):
         queryset = AmountOfIngredient.objects.filter(recipe=obj)
         return AmountOfIngredientSerializer(queryset, many=True).data

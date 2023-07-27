@@ -53,7 +53,7 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
-    
+
     def clean(self):
         if self.user == self.author:
             raise ValidationError(

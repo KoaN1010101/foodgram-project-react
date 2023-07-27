@@ -7,8 +7,9 @@ from recipes.models import (Ingredient, Recipe,
                             AmountOfIngredient, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import (SAFE_METHODS, AllowAny, 
-                                        IsAuthenticated, IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (SAFE_METHODS, AllowAny,
+                                        IsAuthenticated, 
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from api.utils import add_or_delete
 from users.models import Subscription, User
@@ -53,7 +54,10 @@ class UserViewSet(UserViewSet):
                     {'error': 'Вы уже подписаны на этого пользователя'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            serializer = SubscribeSerializer(author, context={'request': request})
+            serializer = SubscribeSerializer(
+                author, 
+                context={'request': request}
+            )
             Subscription.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -95,7 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in SAFE_METHODS:
             return RecipeReadSerializer
         return RecipeCreateSerializer
-    
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
