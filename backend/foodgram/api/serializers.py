@@ -203,7 +203,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Минимум 1 ингредиент.'
             )
-        inrgedient_id_list = [item['id'] for item in data.get('amountofingredient')]
+        inrgedient_id_list = [
+            item['id'] for item in data.get('amountofingredient')
+        ]
         unique_ingredient_id_list = set(inrgedient_id_list)
         if len(inrgedient_id_list) != len(unique_ingredient_id_list):
             raise serializers.ValidationError(
