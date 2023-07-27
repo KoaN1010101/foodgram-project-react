@@ -2,7 +2,6 @@ from django.contrib.auth.hashers import check_password
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from api.utils import creating_an_ingredient
 from recipes.models import (AmountOfIngredient, FavouriteRecipe,
                             Ingredient, Recipe, ShoppingCart, Tag)
 from rest_framework import serializers, status
@@ -135,15 +134,6 @@ class AmountOfIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-class IngredientPostSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    amount = serializers.IntegerField()
-
-    class Meta:
-        model = AmountOfIngredient
-        fields = ('id', 'amount')
-
-
 class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=False, many=True)
     author = UserSerializer(read_only=True)
@@ -174,20 +164,11 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         ).exists())
 
 
-class IngredientsPostSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    amount = serializers.IntegerField()
-
-    class Meta:
-        model = Ingredient
-        fields = ('id', 'amount')
-
-
 class RecipeCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
                                               many=True)
     author = UserSerializer(read_only=True)
-    ingredients = IngredientsPostSerializer(
+    ingredients = AmountOfIngredientSerializer(
         many=True)
     image = Base64ImageField()
 
@@ -220,13 +201,23 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return data
 
     @transaction.atomic
-    def create(self, validated_data):
-        author = self.context.get('request').user
-        ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(author=author, **validated_data)
+    def tags_and_ingredients_set(self, recipe, tags, ingredients):
         recipe.tags.set(tags)
-        creating_an_ingredient(ingredients, recipe)
+        AmountOfIngredient.objects.bulk_create(
+            [AmountOfIngredient(
+                recipe=recipe,
+                ingredient=Ingredient.objects.get(pk=ingredient['id']),
+                amount=ingredient['amount']
+            ) for ingredient in ingredients]
+        )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(author=self.context['request'].user,
+                                       **validated_data)
+        self.tags_and_ingredients_set(recipe, tags, ingredients)
         return recipe
 
     @transaction.atomic
