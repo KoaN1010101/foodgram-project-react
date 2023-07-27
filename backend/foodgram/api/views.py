@@ -8,7 +8,7 @@ from recipes.models import (Ingredient, Recipe,
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (SAFE_METHODS, AllowAny,
-                                        IsAuthenticated, 
+                                        IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from api.utils import add_or_delete
@@ -55,7 +55,7 @@ class UserViewSet(UserViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             serializer = SubscribeSerializer(
-                author, 
+                author,
                 context={'request': request}
             )
             Subscription.objects.create(user=user, author=author)
