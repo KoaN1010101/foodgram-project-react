@@ -243,7 +243,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ).data
 
 
-class FavoriteRecipeSerializer(serializers.ModelSerializer):
+class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Favorite
@@ -257,7 +257,13 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'errors': 'Рецепт уже в избранном'})
         return data
-
+    
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        return RecipeLittleSerializer(
+            instance.recipe,
+            context={'request': request}
+        ).data
 
 class ShoppingCartSerializer(serializers.ModelSerializer):
 
@@ -273,3 +279,10 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'errors': 'Рецепт уже в списке'})
         return data
+    
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        return RecipeLittleSerializer(
+            instance.recipe,
+            context={'request': request}
+        ).data
