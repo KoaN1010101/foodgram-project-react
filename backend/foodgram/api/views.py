@@ -28,7 +28,6 @@ class UserViewSet(UserViewSet):
     pagination_class = CustomPagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
-
     @action(
         detail=True,
         methods=['POST', 'DELETE'],
@@ -99,7 +98,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-        return add_or_delete(request, recipe,FavoriteSerializer)
+        return add_or_delete(request, recipe, FavoriteSerializer)
 
     @action(
         detail=True,
