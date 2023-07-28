@@ -234,6 +234,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                     amount=ingredient.get('amount'),)
             ])
 
+    @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -242,6 +243,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         self.create_ingredients(ingredients, recipe)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         if 'ingredients' in validated_data:
             ingredients = validated_data.pop('ingredients')
