@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-=^cl#=hsiqy2zg(844jsqtnoyx433l$6j1sk1h4hgs%r+=gq1$')
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram24.sytes.net', '84.252.140.85', 'db']
 
