@@ -71,6 +71,13 @@ class SubscribeInfoSerializer(UserSerializer):
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name', 'is_subscribed',
                   'recipes', 'recipes_count',)
+    
+    def get_is_subscribed(self, obj):
+        return (
+            self.context.get('request').user.is_authenticated
+            and Subscription.objects.filter(user=self.context['request'].user,
+                                         author=obj).exists()
+        )
 
     def get_recipes(self, obj):
         request = self.context.get('request')
@@ -108,12 +115,16 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 code=status.HTTP_400_BAD_REQUEST
             )
         return data
+    
+    def get_is_subscribed(self, obj):
+        return (
+            self.context.get('request').user.is_authenticated
+            and Subscription.objects.filter(user=self.context['request'].user,
+                                         author=obj).exists()
+        )
 
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        return SubscribeSerializer(
-            instance.author, context={'request': request}
-        ).data
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -123,15 +134,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class AmountOfIngredientSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(
-        source='ingredient.id',
-    )
-    name = serializers.CharField(
-        source='ingredient.name',
-    )
-    measurement_unit = serializers.CharField(
-        source='ingredient.measurement_unit',
-    )
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit')
 
     class Meta:
         model = AmountOfIngredient
@@ -266,7 +272,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Favorite
-        fields = ('id', 'name', 'image', 'cooking_time')
+        fields = ('user', 'recipe')
 
     def validate(self, data):
         user = self.context.get('request').user
@@ -289,7 +295,6 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ShoppingCart
-        fields = ('id', 'name', 'image', 'cooking_time')
 
     def validate(self, data):
         user = self.context.get('request').user
