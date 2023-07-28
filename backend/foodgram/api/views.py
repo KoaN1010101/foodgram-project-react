@@ -7,7 +7,8 @@ from recipes.models import (Ingredient, Recipe,
                             AmountOfIngredient, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from api.utils import add_or_delete
 from users.models import Subscription, User
@@ -25,6 +26,8 @@ class UserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = CustomPagination
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
 
     @action(
         detail=True,
@@ -32,8 +35,8 @@ class UserViewSet(UserViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def subscribe(self, request, id):
-        user = self.request.user
-        author = get_object_or_404(User, pk=id)
+        user = request.user
+        author = get_object_or_404(User, id=id)
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
@@ -95,7 +98,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated, ]
     )
     def favorite(self, request, pk):
-        return add_or_delete(pk, FavoriteSerializer)
+        recipe = get_object_or_404(Recipe, id=pk)
+        return add_or_delete(request, recipe,FavoriteSerializer)
 
     @action(
         detail=True,
@@ -103,7 +107,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated, ]
     )
     def shopping_cart(self, request, pk):
-        return add_or_delete(pk, ShoppingCartSerializer)
+        recipe = get_object_or_404(Recipe, id=pk)
+        return add_or_delete(request, recipe, ShoppingCartSerializer)
 
     @action(
         detail=False,
