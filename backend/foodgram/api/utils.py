@@ -43,6 +43,7 @@ def creating_an_ingredient(ingredients, recipe):
         )
     AmountOfIngredient.objects.bulk_create(ingredient_list)
 
+
 def recipe_ingredients_set(
     recipe: Recipe, ingredients: dict[int, tuple["Ingredient", int]]
 ) -> None:
