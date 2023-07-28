@@ -69,7 +69,7 @@ class SubscribeRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class SubscribeInfoSerializer(UserSerializer):
+class SubscribeSerializer(serializers.ModelSerializer):
     email = serializers.CharField(
         source='author.email',
         read_only=True)
@@ -91,10 +91,20 @@ class SubscribeInfoSerializer(UserSerializer):
         source='author.recipe.count')
 
     class Meta:
-        model = User
-        fields = ('email', 'id', 'username',
-                  'first_name', 'last_name', 'is_subscribed',
-                  'recipes', 'recipes_count',)
+        model = Subscription
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed', 'recipes', 'recipes_count',)
+
+    def validate(self, data):
+        user = self.context.get('request').user
+        author = self.context.get('author_id')
+        if user.id == int(author):
+            raise serializers.ValidationError({
+                'errors': 'Нельзя подписаться на самого себя'})
+        if Subscription.objects.filter(user=user, author=author).exists():
+            raise serializers.ValidationError({
+                'errors': 'Вы уже подписаны на данного пользователя'})
+        return data
 
     def get_recipes(self, obj):
         recipes = obj.author.recipe.all()
@@ -102,9 +112,6 @@ class SubscribeInfoSerializer(UserSerializer):
             recipes,
             many=True).data
 
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
-    
     def get_is_subscribed(self, obj):
         subscribe = Subscription.objects.filter(
             user=self.context.get('request').user,
@@ -113,35 +120,6 @@ class SubscribeInfoSerializer(UserSerializer):
         if subscribe:
             return True
         return False
-
-
-
-class SubscribeSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Subscription
-        fields = ('email', 'id',
-                  'username', 'first_name',
-                  'last_name', 'is_subscribed',
-                  'recipes', 'recipes_count')
-
-    def validate(self, data):
-        user = self.context.get('request').user
-        author = self.context.get('author_id')
-        if user.follower.filter(author=author, user=user).exists():
-            raise ValidationError(
-                detail='Вы уже подписаны на этого пользователя.',
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        if user == author:
-            raise ValidationError(
-                detail='Вы не можете подписаться на самого себя.',
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        return data
-
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -191,7 +169,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         return (self.context.get('request').user.is_authenticated
                 and Favorite.objects.filter(
                     user=self.context.get('request').user,
-                    favorite_recipe=obj
+                    favorites=obj
         ).exists())
 
     def get_is_in_shopping_cart(self, obj):
@@ -202,9 +180,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         ).exists())
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
-    ingredients = IngredientPostSerializer(
-        many=True, source='amountofingredient'
-    )
+    ingredients = IngredientPostSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
@@ -226,12 +202,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Минимум 1 тэг.'
             )
-        if not data.get('amountofingredient'):
+        if not data.get('amount'):
             raise serializers.ValidationError(
                 'Минимум 1 ингредиент.'
             )
         inrgedient_id_list = [
-            item['id'] for item in data.get('amountofingredient')
+            item['id'] for item in data.get('ingredients')
         ]
         unique_ingredient_id_list = set(inrgedient_id_list)
         if len(inrgedient_id_list) != len(unique_ingredient_id_list):
