@@ -162,4 +162,4 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return (f'Пользователь {self.user.username}'
-                f'добавил {self.recipe.name} в корзину')
+                f'добавил {self.recipe.name} в корзину!')
