@@ -71,12 +71,12 @@ class SubscribeInfoSerializer(UserSerializer):
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name', 'is_subscribed',
                   'recipes', 'recipes_count',)
-    
+
     def get_is_subscribed(self, obj):
         return (
             self.context.get('request').user.is_authenticated
             and Subscription.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
+                                            author=obj).exists()
         )
 
     def get_recipes(self, obj):
@@ -115,12 +115,12 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 code=status.HTTP_400_BAD_REQUEST
             )
         return data
-    
+
     def get_is_subscribed(self, obj):
         return (
             self.context.get('request').user.is_authenticated
             and Subscription.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
+                                            author=obj).exists()
         )
 
     def get_recipes_count(self, obj):
