@@ -82,7 +82,7 @@ class SubscribeInfoSerializer(UserSerializer):
         if recipes_limit:
             recipes = obj.recipes.all()[:int(recipes_limit)]
         return RecipeLittleSerializer(recipes, many=True,
-                                     context={'request': request}).data
+                                      context={'request': request}).data
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -142,7 +142,6 @@ class IngredientPostSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    """Список рецептов без ингридиентов."""
     image = Base64ImageField(read_only=True)
     name = serializers.ReadOnlyField()
     cooking_time = serializers.ReadOnlyField()
