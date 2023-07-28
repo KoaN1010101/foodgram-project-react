@@ -180,7 +180,9 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
-    ingredients = IngredientPostSerializer(many=True)
+    ingredients = IngredientPostSerializer(
+        many=True, source='amountofingredient'
+    )
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
@@ -193,34 +195,27 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                   'name', 'text', 'cooking_time')
 
     def validate(self, data):
-        name = data.get('name')
-        if len(name) < 4:
-            raise serializers.ValidationError({
-                'name': 'Название рецепта минимум 4 символа'})
-        ingredients = data.get('ingredients')
-        for ingredient in ingredients:
-            if not Ingredient.objects.filter(
-                    id=ingredient['id']).exists():
-                raise serializers.ValidationError({
-                    'ingredients': f'Ингредиента с id - {ingredient["id"]} нет'
-                })
-        if len(ingredients) != len(set([item['id'] for item in ingredients])):
+        for field in ['name', 'text', 'cooking_time']:
+            if not data.get(field):
+                raise serializers.ValidationError(
+                    f'{field} - Обязательное поле.'
+                )
+        if not data.get('tags'):
             raise serializers.ValidationError(
-                'Ингредиенты не должны повторяться!')
-        tags = data.get('tags')
-        if len(tags) != len(set([item for item in tags])):
-            raise serializers.ValidationError({
-                'tags': 'Тэги не должны повторяться!'})
-        amounts = data.get('ingredients')
-        if [item for item in amounts if item['amount'] < 1]:
-            raise serializers.ValidationError({
-                'amount': 'Минимальное количество ингридиента 1'
-            })
-        cooking_time = data.get('cooking_time')
-        if cooking_time > 300 or cooking_time < 1:
-            raise serializers.ValidationError({
-                'cooking_time': 'Время приготовления блюда от 1 до 300 минут'
-            })
+                'Минимум 1 тэг.'
+            )
+        if not data.get('amountofingredient'):
+            raise serializers.ValidationError(
+                'Минимум 1 ингредиент.'
+            )
+        inrgedient_id_list = [
+            item['id'] for item in data.get('amountofingredient')
+        ]
+        unique_ingredient_id_list = set(inrgedient_id_list)
+        if len(inrgedient_id_list) != len(unique_ingredient_id_list):
+            raise serializers.ValidationError(
+                'Ингредиенты должны быть уникальны.'
+            )
         return data
 
     @transaction.atomic
