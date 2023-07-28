@@ -156,6 +156,10 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author', 'ingredients',
                   'is_favorited', 'is_in_shopping_cart', 'name',
                   'image', 'text', 'cooking_time')
+    
+    def get_ingredients(self, obj):
+        ingredients = AmountOfIngredient.objects.filter(recipe=obj)
+        return AmountOfIngredientSerializer(ingredients, many=True).data
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
@@ -223,7 +227,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('ingredients')
+        ingredients = validated_data.pop('amountofingredient')
         tags = validated_data.pop('tags')
         instance.tags.clear()
         instance.tags.set(tags)
