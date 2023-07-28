@@ -1,13 +1,11 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from djoser.serializers import (PasswordSerializer, UserCreateSerializer,
                                 UserSerializer)
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import (FavoriteRecipe, Ingredient, IngredientAmount,
-                            Recipe, ShoppingCart, Subscribe, Tag)
+from recipes.models import (Favorite, Ingredient, AmountOfIngredient,
+                            Recipe, ShoppingCart, Tag)
 from rest_framework import serializers
-
-User = get_user_model()
+from users.models import Subscription, User
 
 
 class UserListSerializer(UserSerializer):
@@ -20,7 +18,7 @@ class UserListSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         return (self.context.get('request').user.is_authenticated
-                and Subscribe.objects.filter(
+                and Subscription.objects.filter(
                     user=self.context.get('request').user,
                     author=obj
         ).exists())
@@ -51,7 +49,7 @@ class IngrediendAmountSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = IngredientAmount
+        model = AmountOfIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
@@ -86,7 +84,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         return (self.context.get('request').user.is_authenticated
-                and FavoriteRecipe.objects.filter(
+                and Favorite.objects.filter(
                     user=self.context.get('request').user,
                     favorite_recipe=obj
         ).exists())
@@ -156,8 +154,8 @@ class RecipeEditSerializer(serializers.ModelSerializer):
 
     def create_ingredients(self, ingredients, recipe):
         for ingredient in ingredients:
-            IngredientAmount.objects.bulk_create([
-                IngredientAmount(
+            AmountOfIngredient.objects.bulk_create([
+                AmountOfIngredient(
                     recipe=recipe,
                     ingredient_id=ingredient.get('id'),
                     amount=ingredient.get('amount'),)
@@ -242,7 +240,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         source='author.recipe.count')
 
     class Meta:
-        model = Subscribe
+        model = Subscription
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed', 'recipes', 'recipes_count',)
 
@@ -252,7 +250,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         if user.id == int(author):
             raise serializers.ValidationError({
                 'errors': 'Нельзя подписаться на самого себя'})
-        if Subscribe.objects.filter(user=user, author=author).exists():
+        if Subscription.objects.filter(user=user, author=author).exists():
             raise serializers.ValidationError({
                 'errors': 'Вы уже подписаны на данного пользователя'})
         return data
@@ -264,7 +262,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
             many=True).data
 
     def get_is_subscribed(self, obj):
-        subscribe = Subscribe.objects.filter(
+        subscribe = Subscription.objects.filter(
             user=self.context.get('request').user,
             author=obj.author
         )
@@ -289,13 +287,13 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = FavoriteRecipe
+        model = Favorite
         fields = ('id', 'name', 'image', 'cooking_time')
 
     def validate(self, data):
         user = self.context.get('request').user
         recipe = self.context.get('recipe_id')
-        if FavoriteRecipe.objects.filter(user=user,
+        if Favorite.objects.filter(user=user,
                                          favorite_recipe=recipe).exists():
             raise serializers.ValidationError({
                 'errors': 'Рецепт уже в избранном'})

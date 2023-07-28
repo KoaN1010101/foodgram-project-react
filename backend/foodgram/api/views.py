@@ -1,16 +1,16 @@
-from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.models import (FavoriteRecipe, Ingredient, Recipe, ShoppingCart,
-                            Subscribe, Tag)
+from recipes.models import (Favorite, Ingredient, Recipe, ShoppingCart,
+                            Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
+from users.models import Subscription, User
 from .filters import IngredientFilter, RecipesFilter
 from .mixins import CreateDestroyViewSet
 from .permissions import IsAuthorOrReadOnly
@@ -19,8 +19,6 @@ from .serializers import (FavoriteRecipeSerializer, IngredientSerializer,
                           SetPasswordSerializer, ShoppingCartSerializer,
                           SubscribeSerializer, TagSerializer,
                           UserCreateSerializer, UserListSerializer)
-
-User = get_user_model()
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -101,7 +99,7 @@ class CustomUserViewSet(UserViewSet):
         detail=False,
         permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
-        queryset = Subscribe.objects.filter(user=request.user)
+        queryset = Subscription.objects.filter(user=request.user)
         pages = self.paginate_queryset(queryset)
         serializer = SubscribeSerializer(
             pages,
@@ -110,7 +108,7 @@ class CustomUserViewSet(UserViewSet):
         return self.get_paginated_response(serializer.data)
 
 
-class SubscribeViewSet(CreateDestroyViewSet):
+class SubscriptionViewSet(CreateDestroyViewSet):
     serializer_class = SubscribeSerializer
 
     def get_queryset(self):
@@ -133,24 +131,24 @@ class SubscribeViewSet(CreateDestroyViewSet):
     @action(methods=('delete',), detail=True)
     def delete(self, request, user_id):
         get_object_or_404(User, id=user_id)
-        if not Subscribe.objects.filter(
+        if not Subscription.objects.filter(
                 user=request.user, author_id=user_id).exists():
             return Response({'errors': 'Вы не были подписаны на автора'},
                             status=status.HTTP_400_BAD_REQUEST)
         get_object_or_404(
-            Subscribe,
+            Subscription,
             user=request.user,
             author_id=user_id
         ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class FavoriteRecipeViewSet(CreateDestroyViewSet):
+class FavoriteViewSet(CreateDestroyViewSet):
     serializer_class = FavoriteRecipeSerializer
 
     def get_queryset(self):
         user = self.request.user.id
-        return FavoriteRecipe.objects.filter(user=user)
+        return Favorite.objects.filter(user=user)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -175,7 +173,7 @@ class FavoriteRecipeViewSet(CreateDestroyViewSet):
             return Response({'errors': 'Рецепт не в избранном'},
                             status=status.HTTP_400_BAD_REQUEST)
         get_object_or_404(
-            FavoriteRecipe,
+            Favorite,
             user=request.user,
             favorite_recipe_id=recipe_id).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

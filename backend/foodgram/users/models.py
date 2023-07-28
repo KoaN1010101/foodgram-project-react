@@ -2,24 +2,33 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from rest_framework.exceptions import ValidationError
+
+
 class User(AbstractUser):
     username = models.CharField(
-        'Логин',
-        max_length=150,
-        unique=True,
+        verbose_name='Пользователь',
+        max_length=200,
+        unique=True
     )
     email = models.EmailField(
-        'Email',
-        max_length=254,
-        unique=True,
+        verbose_name='Электронная почта',
+        max_length=200,
+        unique=True
     )
     first_name = models.CharField(
-        'Имя',
-        max_length=150,
+        verbose_name='Имя',
+        max_length=200,
     )
     last_name = models.CharField(
-        'Фамилия',
-        max_length=150,
+        verbose_name='Фамилия',
+        max_length=200,
+    )
+    password = models.CharField(
+        verbose_name='Пароль',
+        max_length=200,
     )
 
     class Meta:
@@ -28,4 +37,32 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return f'{self.username}, {self.email}'
+        return self.username
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscriber',
+        verbose_name='Подписчик'
+    )
+    author = models.ForeignKey(
+        User,
+        related_name='subscribing',
+        verbose_name='Автор',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError(
+                {'error': 'Невозможно подписаться на себя'}
+            )
+
+    def __str__(self):
+        return f'{self.user.username} подписан на {self.author.username}'
