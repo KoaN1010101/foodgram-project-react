@@ -75,15 +75,14 @@ class SubscribeInfoSerializer(UserSerializer):
 
     def get_recipes(self, obj):
         request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
+        recipes_limit = None
+        if request:
+            recipes_limit = request.query_params.get('recipes_limit')
         recipes = obj.recipes.all()
-        if limit:
-            recipes = recipes[:int(limit)]
-        serializer = RecipeLittleSerializer(recipes, many=True, read_only=True)
-        return serializer.data
-
-    def get_recipes_count(self, obj):
-        return obj.recipes.count()
+        if recipes_limit:
+            recipes = obj.recipes.all()[:int(recipes_limit)]
+        return RecipeLittleSerializer(recipes, many=True,
+                                     context={'request': request}).data
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -140,6 +139,18 @@ class IngredientPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = AmountOfIngredient
         fields = ('id', 'amount')
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    """Список рецептов без ингридиентов."""
+    image = Base64ImageField(read_only=True)
+    name = serializers.ReadOnlyField()
+    cooking_time = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name',
+                  'image', 'cooking_time')
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
