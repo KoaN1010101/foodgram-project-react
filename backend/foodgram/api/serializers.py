@@ -72,13 +72,6 @@ class SubscribeInfoSerializer(UserSerializer):
                   'first_name', 'last_name', 'is_subscribed',
                   'recipes', 'recipes_count',)
 
-    def get_is_subscribed(self, obj):
-        return (
-            self.context.get('request').user.is_authenticated
-            and Subscription.objects.filter(user=self.context['request'].user,
-                                            author=obj).exists()
-        )
-
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
@@ -93,14 +86,9 @@ class SubscribeInfoSerializer(UserSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    email = serializers.ReadOnlyField()
-    username = serializers.ReadOnlyField()
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = RecipeLittleSerializer(many=True, read_only=True)
-    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
+        model = Subscription
         fields = ('email', 'id',
                   'username', 'first_name',
                   'last_name', 'is_subscribed',
@@ -120,13 +108,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 code=status.HTTP_400_BAD_REQUEST
             )
         return data
-
-    def get_is_subscribed(self, obj):
-        return (
-            self.context.get('request').user.is_authenticated
-            and Subscription.objects.filter(user=self.context['request'].user,
-                                            author=obj).exists()
-        )
 
     def to_representation(self, instance):
         request = self.context.get('request')
@@ -170,7 +151,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     ingredients = AmountOfIngredientSerializer(many=True, read_only=True,
-                                               source='amountofingredient')
+                                               source='recipes')
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=False)
@@ -247,15 +228,29 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('amountofingredient')
-        instance.image = validated_data.get('image', instance.image)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time)
-        AmountOfIngredient.objects.filter(recipe=instance).delete()
-        super().update(instance, validated_data)
-        creating_an_ingredient(ingredients, instance)
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        instance = super().update(instance, validated_data)
+        instance.tags.clear()
+        instance.tags.set(tags)
+        instance.ingredient.clear()
+        ingredient_counts = {}
+        for ingredient in ingredients:
+            ingredient_id = ingredient['id']
+            amount = ingredient['amount']
+            if ingredient_id in ingredient_counts:
+                ingredient_counts[ingredient_id] += amount
+            else:
+                ingredient_counts[ingredient_id] = amount
+        create_ingredients = [
+            AmountOfIngredient(
+                recipe=instance,
+                ingredient_id=ingredient_id,
+                amount=amount
+            )
+            for ingredient_id, amount in ingredient_counts.items()
+        ]
+        AmountOfIngredient.objects.bulk_create(create_ingredients)
         instance.save()
         return instance
 
