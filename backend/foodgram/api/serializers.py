@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import check_password
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from api.utils import creating_an_ingredient
+from api.utils import creating_an_ingredient, recipe_ingredients_set
 from recipes.models import (AmountOfIngredient, Favorite,
                             Ingredient, Recipe, ShoppingCart, Tag)
 from rest_framework import serializers, status
@@ -127,6 +127,7 @@ class AmountOfIngredientSerializer(serializers.ModelSerializer):
         source='ingredient.measurement_unit',
         read_only=True
     )
+    amount = serializers.IntegerField()
 
     class Meta:
         model = AmountOfIngredient
@@ -146,7 +147,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     ingredients = AmountOfIngredientSerializer(many=True, read_only=True,
-                                               source='recipes')
+                                               source='amountofingredient')
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=False)
@@ -222,16 +223,24 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return recipe
 
     @transaction.atomic
-    def update(self, instance, validated_data):
-        ingredients = validated_data.pop('amountofingredient')
+    def update(self, recipe: Recipe, validated_data: dict):
         tags = validated_data.pop('tags')
-        instance.tags.clear()
-        instance.tags.set(tags)
-        AmountOfIngredient.objects.filter(recipe=instance).delete()
-        super().update(instance, validated_data)
-        creating_an_ingredient(ingredients, instance)
-        instance.save()
-        return instance
+        ingredients = validated_data.pop('ingredients')
+
+        for key, value in validated_data.items():
+            if hasattr(recipe, key):
+                setattr(recipe, key, value)
+
+        if tags:
+            recipe.tags.clear()
+            recipe.tags.set(tags)
+
+        if ingredients:
+            recipe.ingredients.clear()
+            recipe_ingredients_set(recipe, ingredients)
+
+        recipe.save()
+        return recipe
 
     def to_representation(self, instance):
         request = self.context.get('request')

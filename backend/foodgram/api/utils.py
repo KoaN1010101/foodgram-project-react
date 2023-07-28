@@ -42,3 +42,28 @@ def creating_an_ingredient(ingredients, recipe):
             )
         )
     AmountOfIngredient.objects.bulk_create(ingredient_list)
+
+def recipe_ingredients_set(
+    recipe: Recipe, ingredients: dict[int, tuple["Ingredient", int]]
+) -> None:
+    """Записывает ингредиенты вложенные в рецепт.
+
+    Создаёт объект AmountIngredient связывающий объекты Recipe и
+    Ingredient с указанием количества(`amount`) конкретного ингридиента.
+
+    Args:
+        recipe (Recipe):
+            Рецепт, в который нужно добавить игридиенты.
+        ingridients (list[dict]):
+            Список ингридентов и количества сих.
+    """
+    objs = []
+
+    for ingredient, amount in ingredients.values():
+        objs.append(
+            AmountIngredient(
+                recipe=recipe, ingredients=ingredient, amount=amount
+            )
+        )
+
+    AmountOfIngredient.objects.bulk_create(objs)
