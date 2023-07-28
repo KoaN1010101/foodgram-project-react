@@ -17,7 +17,7 @@ from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (IngredientSerializer, FavoriteSerializer,
                              RecipeCreateSerializer, RecipeReadSerializer,
                              ShoppingCartSerializer,
-                             SubscribeSerializer,
+                             SubscribeSerializer, SubscribeInfoSerializer,
                              TagSerializer, UserSerializer)
 
 
@@ -55,7 +55,7 @@ class UserViewSet(UserViewSet):
         user = self.request.user
         queryset = User.objects.filter(following__username=user)
         page = self.paginate_queryset(queryset)
-        serializer = SubscribeSerializer(
+        serializer = SubscribeInfoSerializer(
             page, many=True, context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
