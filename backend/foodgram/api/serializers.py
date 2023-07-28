@@ -5,8 +5,7 @@ from drf_extra_fields.fields import Base64ImageField
 from api.utils import creating_an_ingredient
 from recipes.models import (AmountOfIngredient, Favorite,
                             Ingredient, Recipe, ShoppingCart, Tag)
-from rest_framework import serializers, status
-from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from users.models import User, Subscription
 
@@ -178,6 +177,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
                     user=self.context.get('request').user,
                     recipe=obj
         ).exists())
+
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     ingredients = IngredientPostSerializer(many=True)
