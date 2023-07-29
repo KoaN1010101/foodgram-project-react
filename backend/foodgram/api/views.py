@@ -45,7 +45,7 @@ class UserViewSet(UserViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, **kwargs):
-        author = get_object_or_404(User, id=kwargs['pk'])
+        author = get_object_or_404(User, id=kwargs['id'])
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
