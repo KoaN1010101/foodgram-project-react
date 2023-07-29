@@ -138,30 +138,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {'detail': 'Рецепт успешно удален из списка покупок.'},
                 status=status.HTTP_204_NO_CONTENT
             )
-
+        
     @action(
         detail=False,
         methods=['get'],
         permission_classes=[IsAuthenticated, ]
     )
-    def download_shopping_cart(self, request):
+    def download_shopping_cart(self, request, **kwargs):
         user = request.user
-        if not user.shopping_cart.exists():
-            return Response(
-                'Корзина пустая', status=status.HTTP_400_BAD_REQUEST)
-
-        ingredients = AmountOfIngredient.objects.filter(
-            recipe__carts__user=request.user
-        ).values(
-            'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(ingredient_amount=Sum('amount'))
-        shopping_list = ['Список покупок:\n']
-        for ingredient in ingredients:
-            name = ingredient['ingredient__name']
-            unit = ingredient['ingredient__measurement_unit']
-            amount = ingredient['ingredient_amount']
-            shopping_list.append(f'\n{name} - {amount}, {unit}')
-        response = HttpResponse(shopping_list, content_type='text/plain')
+        ingredients = (
+            AmountOfIngredient.objects
+            .filter(recipe__shopping_cart__user=request.user)
+            .values('ingredient')
+            .annotate(total_amount=Sum('amount'))
+            .values_list('ingredient__name', 'total_amount',
+                         'ingredient__measurement_unit')
+        )
+        file_list = []
+        [file_list.append(
+            '{} - {} {}.'.format(*ingredient)) for ingredient in ingredients]
         filename = f'{user.username}_shopping_list.txt'
-        response['Content-Disposition'] = f'attachment; filename={filename}'
-        return response
+        file = HttpResponse('Cписок покупок:\n' + '\n'.join(file_list),
+                            content_type='text/plain')
+        file['Content-Disposition'] = (f'attachment; filename={filename}')
+        return file
