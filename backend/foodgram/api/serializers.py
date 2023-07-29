@@ -26,11 +26,13 @@ class UserSerializer(UserSerializer):
                   'first_name', 'last_name', 'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        return (self.context.get('request').user.is_authenticated
-                and Subscription.objects.filter(
-                    user=self.context.get('request').user,
-                    author=obj
-        ).exists())
+        if (self.context.get('request')
+           and not self.context['request'].user.is_anonymous):
+            return Subscription.objects.filter(
+                user=self.context['request'].user,
+                author=obj
+            ).exists()
+        return False
 
 
 class RecipeLittleSerializer(serializers.ModelSerializer):

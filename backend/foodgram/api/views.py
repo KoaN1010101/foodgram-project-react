@@ -15,7 +15,7 @@ from api.pagination import CustomPagination
 from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (IngredientSerializer,
                              RecipeCreateSerializer, RecipeReadSerializer,
-                             RecipeSerializer,
+                             RecipeSerializer, SetPasswordSerializer,
                              SubscribeSerializer, SubscribeInfoSerializer,
                              TagSerializer, UserSerializer,
                              UserCreateSerializer)
@@ -41,6 +41,15 @@ class UserViewSet(mixins.CreateModelMixin,
         serializer = UserSerializer(request.user)
         return Response(serializer.data,
                         status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'],
+            permission_classes=(IsAuthenticated,))
+    def set_password(self, request):
+        serializer = SetPasswordSerializer(request.user, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response({'detail': 'Пароль успешно изменен!'},
+                        status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,),
