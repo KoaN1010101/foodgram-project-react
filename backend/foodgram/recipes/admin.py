@@ -21,13 +21,13 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author', 'favourites_amount')
-    readonly_fields = ('favourites_amount',)
+    list_display = ('id', 'name', 'author', 'in_favorites')
+    readonly_fields = ('in_favorites',)
     list_filter = ('name', 'author', 'tags')
     empty_value_display = '-пусто-'
 
     @admin.display(description='В избранном')
-    def favourites_amount(self, obj):
+    def in_favorites(self, obj):
         return obj.favorite.count()
 
 
@@ -40,7 +40,7 @@ class AmountOfIngredientAdmin(admin.ModelAdmin):
 @admin.register(Favorite)
 class Favorite(admin.ModelAdmin):
     list_display = ('id', 'user', 'recipe')
-    search_fields = ('user', 'favourtie_recipe')
+    search_fields = ('user', 'recipe')
     empty_value_display = '-пусто-'
 
 

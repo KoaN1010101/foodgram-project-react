@@ -33,6 +33,14 @@ class UserViewSet(mixins.CreateModelMixin,
         if self.action in ('list', 'retrieve'):
             return UserSerializer
         return UserCreateSerializer
+    
+    @action(detail=False, methods=['get'],
+            pagination_class=None,
+            permission_classes=(IsAuthenticated,))
+    def me(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data,
+                        status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,),
@@ -47,7 +55,7 @@ class UserViewSet(mixins.CreateModelMixin,
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, **kwargs):
-        author = get_object_or_404(User, id=kwargs['pk'])
+        author = get_object_or_404(User, id=kwargs['id'])
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
