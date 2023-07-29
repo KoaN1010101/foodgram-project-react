@@ -33,7 +33,7 @@ class UserViewSet(mixins.CreateModelMixin,
         if self.action in ('list', 'retrieve'):
             return UserSerializer
         return UserCreateSerializer
-    
+
     @action(detail=False, methods=['get'],
             pagination_class=None,
             permission_classes=(IsAuthenticated,))
