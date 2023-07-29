@@ -76,7 +76,7 @@ class UserViewSet(mixins.CreateModelMixin,
         if request.method == 'DELETE':
             get_object_or_404(Subscription, user=request.user,
                               author=author).delete()
-            return Response({'detail': 'Успешная отписка'},
+            return Response({'detail': 'Успешно'},
                             status=status.HTTP_204_NO_CONTENT)
 
 
