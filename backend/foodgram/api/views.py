@@ -2,11 +2,10 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet
 from recipes.models import (Ingredient, Recipe,
                             AmountOfIngredient, Tag,
                             ShoppingCart, Favorite)
-from rest_framework import status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -22,7 +21,10 @@ from api.serializers import (IngredientSerializer,
                              UserCreateSerializer)
 
 
-class UserViewSet(UserViewSet):
+class UserViewSet(mixins.CreateModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
+                  viewsets.GenericViewSet):
     queryset = User.objects.all()
     pagination_class = CustomPagination
     permission_classes = (AllowAny,)
@@ -45,16 +47,15 @@ class UserViewSet(UserViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, **kwargs):
-        author = get_object_or_404(User, id=kwargs['id'])
+        author = get_object_or_404(User, id=kwargs['pk'])
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
-                data={'user': request.user.id, 'author': author.id},
-                context={'request': request}
-            )
+                author, data=request.data, context={"request": request})
             serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            Subscription.objects.create(user=request.user, author=author)
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
             get_object_or_404(Subscription, user=request.user,
