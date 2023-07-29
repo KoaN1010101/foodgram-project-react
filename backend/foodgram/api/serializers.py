@@ -5,8 +5,7 @@ from drf_extra_fields.fields import Base64ImageField
 from api.utils import creating_an_ingredient
 from recipes.models import (AmountOfIngredient, Favorite,
                             Ingredient, Recipe, ShoppingCart, Tag)
-from rest_framework import serializers, status
-from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from users.models import User, Subscription
 
@@ -88,12 +87,12 @@ class SubscribeInfoSerializer(UserSerializer):
         return (
             self.context.get('request').user.is_authenticated
             and Subscription.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
+                                            author=obj).exists()
         )
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
-    
+
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
@@ -127,7 +126,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return (
             self.context.get('request').user.is_authenticated
             and Subscription.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
+                                            author=obj).exists()
         )
 
     def get_recipes_count(self, obj):
@@ -144,7 +143,8 @@ class AmountOfIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit')
+        source='ingredient.measurement_unit'
+    )
 
     class Meta:
         model = AmountOfIngredient

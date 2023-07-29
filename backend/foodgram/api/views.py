@@ -138,7 +138,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {'detail': 'Рецепт успешно удален из списка покупок.'},
                 status=status.HTTP_204_NO_CONTENT
             )
-        
+
     @action(
         detail=False,
         methods=['get'],
