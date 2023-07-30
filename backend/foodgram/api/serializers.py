@@ -1,7 +1,8 @@
+import base64
 from django.contrib.auth.hashers import check_password
+from django.core.files.base import ContentFile
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from drf_extra_fields.fields import Base64ImageField
 from api.utils import creating_an_ingredient
 from recipes.models import (AmountOfIngredient, Favorite,
                             Ingredient, Recipe, ShoppingCart, Tag)
@@ -15,6 +16,11 @@ class UserCreateSerializer(UserCreateSerializer):
         model = User
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name', 'password')
+        extra_kwargs = {
+            'first_name': {'required': True, 'allow_blank': False},
+            'last_name': {'required': True, 'allow_blank': False},
+            'email': {'required': True, 'allow_blank': False},
+        }
 
 
 class UserSerializer(UserSerializer):
@@ -33,6 +39,17 @@ class UserSerializer(UserSerializer):
                 author=obj
             ).exists()
         return False
+
+
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        return super().to_internal_value(data)
 
 
 class RecipeLittleSerializer(serializers.ModelSerializer):

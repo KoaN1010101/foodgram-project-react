@@ -68,7 +68,7 @@ class UserViewSet(mixins.CreateModelMixin,
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
-                author, data=request.data, context={"request": request})
+                author, data=request.data, context={'request': request})
             serializer.is_valid(raise_exception=True)
             Subscription.objects.create(user=request.user, author=author)
             return Response(serializer.data,
