@@ -14,7 +14,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGINS = [
-    'https://foodgram24.sytes.net/' 
+    'https://foodgram24.sytes.net/'
 ]
 
 INSTALLED_APPS = [
