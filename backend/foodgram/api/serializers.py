@@ -16,6 +16,11 @@ class UserCreateSerializer(UserCreateSerializer):
         model = User
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name', 'password')
+        extra_kwargs = {
+            'first_name': {'required': True, 'allow_blank': False},
+            'last_name': {'required': True, 'allow_blank': False},
+            'email': {'required': True, 'allow_blank': False},
+        }
 
 
 class UserSerializer(UserSerializer):
