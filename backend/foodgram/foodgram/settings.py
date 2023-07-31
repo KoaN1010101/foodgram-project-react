@@ -11,7 +11,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-=^cl#=hsiqy2zg(844
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram24.sytes.net', '84.252.140.85', 'db']
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOWED_ORIGINS = [
+    'https://foodgram24.sytes.net/' 
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
