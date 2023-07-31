@@ -18,8 +18,8 @@ services:
     restart: always
     env_file: .env
     volumes:
-      - static_value:/app/static/
-      - media_value:/app/media/
+      - static_value:/backend_static
+      - media_value:/app/media
     depends_on:
       - db
 
@@ -27,8 +27,9 @@ services:
     image: koan24/foodgram_frontend:latest
     env_file:
       - ./.env
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-       - ../frontend/:/app/result_build/
+      - static_value:/frontend_static
     depends_on:
       - backend
 
@@ -37,10 +38,9 @@ services:
     env_file: .env
     restart: always
     volumes:
-      - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
-      - static_value:/var/html/static/
-      - media_value:/var/html/media/
+      - static_value:/staticfiles/
+      - media_value:/media
     ports:
       - 8000:80
     depends_on:
