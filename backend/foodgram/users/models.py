@@ -8,6 +8,15 @@ class User(AbstractUser):
         max_length=200,
         unique=True
     )
+    username = models.CharField(
+        'Имя пользователя',
+        max_length=150,
+        unique=True
+    )
+    password = models.CharField(
+        'Пароль',
+        max_length=150
+    )
 
     class Meta:
         ordering = ('username',)

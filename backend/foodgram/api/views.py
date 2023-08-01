@@ -48,7 +48,7 @@ class UserViewSet(mixins.CreateModelMixin,
         serializer = SetPasswordSerializer(request.user, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-        return Response({'detail': 'Пароль успешно изменен!'},
+        return Response({'detail': 'Вы сменили пароль!'},
                         status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
@@ -130,7 +130,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'DELETE':
             get_object_or_404(Favorite, user=request.user,
                               recipe=recipe).delete()
-            return Response({'detail': 'Рецепт успешно удален из избранного.'},
+            return Response({'detail': 'Рецепт удален из избранного.'},
                             status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['post', 'delete'],
@@ -155,7 +155,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             get_object_or_404(ShoppingCart, user=request.user,
                               recipe=recipe).delete()
             return Response(
-                {'detail': 'Рецепт успешно удален из списка покупок.'},
+                {'detail': 'Рецепт удален из списка покупок.'},
                 status=status.HTTP_204_NO_CONTENT
             )
 
@@ -164,7 +164,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=['get'],
         permission_classes=[IsAuthenticated, ]
     )
-    def download_shopping_cart(self, request, **kwargs):
+    def download_shopping_cart(self, request):
         user = request.user
         ingredients = (
             AmountOfIngredient.objects
