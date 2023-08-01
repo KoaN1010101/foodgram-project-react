@@ -63,7 +63,7 @@ class Recipe(models.Model):
     )
     text = models.TextField(
         verbose_name='Описание',
-        max_length=500
+        max_length=1000
     )
     ingredients = models.ManyToManyField(
         Ingredient,
