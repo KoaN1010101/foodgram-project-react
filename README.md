@@ -6,26 +6,31 @@ Foodgram - "продуктовый помощник". Данный проект 
 Почта: admin@mailmail.com
 Пароль: amdin24
 
-# Развертывание проекта
--Клонируйте репозиторий:
+# Запус проекта локально
+## Клонируйте репозиторий:
 
 git clone git@github.com:koan1010101/foodgram-project-react.git
 
-- Установите и активируйте виртуальное окружение:
+## Установите и активируйте виртуальное окружение:
 
 для MacOS
+
 python3 -m venv venv
+
 для Windows
 python -m venv venv
 source venv/bin/activate
 source venv/Scripts/activate
-- Установите зависимости из файла requirements.txt:
+
+## Установите зависимости из файла requirements.txt:
 
 pip install -r requirements.txt
-- Примените миграции:
+
+## Примените миграции:
 
 python manage.py migrate
-- В папке с файлом manage.py выполните команду для запуска локально:
+
+## В папке с файлом manage.py выполните команду для запуска локально:
 
 python manage.py runserver
 - Локально Документация доступна по адресу:
