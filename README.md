@@ -9,7 +9,7 @@ Foodgram - "продуктовый помощник". Данный проект 
 - Почта: admin@mailmail.com
 - Пароль: admin24
 
-# Запус проекта локально
+# Запуск проекта локально
 ## Клонируйте репозиторий:
 ```
 git clone git@github.com:koan1010101/foodgram-project-react.git
