@@ -132,6 +132,3 @@ git push
 
 # Автор проекта
 **Никулин Владимир**
-
-![Alt-текст](https://forum.clientmod.ru/attachments/223/)
-
